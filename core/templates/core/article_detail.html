@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% block title %}{{ article.titre }} — Article{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    {% if article.image %}
+      <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.titre }}">
+    {% endif %}
+    <div class="card-body">
+      <h1 class="card-title">{{ article.titre }}</h1>
+      <p class="text-muted">
+        <span class="badge bg-secondary">{{ article.get_categorie_display }}</span>
+        <span class="ms-2">{{ article.date_publication|date:"d M Y" }}</span>
+        {% if article.auteur %} — Par {{ article.auteur }}{% endif %}
+      </p>
+      <p class="card-text">{{ article.contenu|linebreaks }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %} 

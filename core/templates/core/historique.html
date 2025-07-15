@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+{% block title %}Historique de mes recherches — Rassurez-moi{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="section-title mb-4">Mon historique de recherches</h1>
+  {% if recherches %}
+    <div class="list-group">
+      {% for r in recherches %}
+        <div class="list-group-item bg-violet mb-2 rounded-3 shadow-sm">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Symptômes :</strong> {{ r.symptomes_bam|truncatechars:60 }}<br>
+              <span class="text-muted small">{{ r.date|date:"d M Y H:i" }}</span>
+            </div>
+            {% if r.reponse_mp3 %}
+              <audio controls style="height: 32px;">
+                <source src="{{ r.reponse_mp3.url }}" type="audio/mpeg">
+                Votre navigateur ne supporte pas l'audio.
+              </audio>
+            {% endif %}
+          </div>
+          {% if r.reponse_bam %}
+            <div class="mt-2"><strong>Réponse :</strong> {{ r.reponse_bam|truncatechars:100 }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">Aucune recherche enregistrée pour l’instant.</div>
+  {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,343 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Test Transcription Batch - Colab{% endblock %}
+
+{% block extra_css %}
+<style>
+    .batch-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .upload-area {
+        border: 2px dashed #007bff;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        margin: 20px 0;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        border-color: #0056b3;
+        background: #e9ecef;
+    }
+    
+    .file-list {
+        margin: 20px 0;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .file-item:last-child {
+        border-bottom: none;
+    }
+    
+    .btn-batch {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    .btn-batch:hover {
+        background: #218838;
+    }
+    
+    .btn-batch:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .results-table th,
+    .results-table td {
+        border: 1px solid #dee2e6;
+        padding: 12px;
+        text-align: left;
+    }
+    
+    .results-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    
+    .status-success {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .status-error {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .loading {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="batch-container">
+    <h1>📁 Test Transcription Batch - Colab</h1>
+    
+    <div class="status-card">
+        <h3>🎤 Transcription par batch</h3>
+        <p>Sélectionnez plusieurs fichiers audio pour les transcrire en une fois :</p>
+        
+        <div class="upload-area" id="upload-area">
+            <div id="upload-text">
+                <i class="fas fa-folder-open" style="font-size: 48px; color: #007bff;"></i>
+                <p>Cliquez pour sélectionner plusieurs fichiers audio</p>
+                <p><small>Formats supportés : WAV, MP3, M4A, FLAC</small></p>
+            </div>
+            <input type="file" id="audio-files" accept="audio/*" multiple style="display: none;">
+        </div>
+        
+        <div class="file-list" id="file-list" style="display: none;">
+            <h4>📋 Fichiers sélectionnés :</h4>
+            <div id="file-items"></div>
+        </div>
+        
+        <button class="btn-batch" id="batch-btn" onclick="testBatchTranscription()" disabled>
+            Transcrire tous les fichiers
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Transcription en cours...</p>
+            <p><small>Cette opération peut prendre plusieurs minutes selon le nombre de fichiers.</small></p>
+        </div>
+        
+        <div id="results-area" style="display: none;">
+            <h4>📊 Résultats de la transcription :</h4>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Fichier</th>
+                        <th>Status</th>
+                        <th>Transcription</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="status-card">
+        <h3>⚙️ Informations techniques</h3>
+        <ul>
+            <li><strong>Modèle :</strong> RobotsMali/stt-bm-quartznet15x5-V0</li>
+            <li><strong>Format audio :</strong> Mono, 16kHz, WAV</li>
+            <li><strong>Langue :</strong> Bambara</li>
+            <li><strong>Serveur :</strong> Google Colab</li>
+            <li><strong>Limite :</strong> Maximum 10 fichiers par batch</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let selectedFiles = [];
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    setupBatchUpload();
+});
+
+// Configuration de la zone de upload
+function setupBatchUpload() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('audio-files');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        handleFilesSelect(files);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        handleFilesSelect(files);
+    });
+}
+
+// Gestion de la sélection de fichiers
+function handleFilesSelect(files) {
+    const audioFiles = files.filter(file => file.type.startsWith('audio/'));
+    
+    if (audioFiles.length === 0) {
+        alert('Veuillez sélectionner des fichiers audio valides.');
+        return;
+    }
+    
+    if (audioFiles.length > 10) {
+        alert('Maximum 10 fichiers autorisés par batch.');
+        return;
+    }
+    
+    selectedFiles = audioFiles;
+    displayFileList();
+    document.getElementById('batch-btn').disabled = false;
+}
+
+// Affichage de la liste des fichiers
+function displayFileList() {
+    const fileList = document.getElementById('file-list');
+    const fileItems = document.getElementById('file-items');
+    
+    fileItems.innerHTML = '';
+    
+    selectedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+            <div>
+                <strong>${file.name}</strong>
+                <br><small>Taille : ${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+            </div>
+            <button onclick="removeFile(${index})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                Supprimer
+            </button>
+        `;
+        fileItems.appendChild(fileItem);
+    });
+    
+    fileList.style.display = 'block';
+}
+
+// Supprimer un fichier
+function removeFile(index) {
+    selectedFiles.splice(index, 1);
+    displayFileList();
+    
+    if (selectedFiles.length === 0) {
+        document.getElementById('batch-btn').disabled = true;
+        document.getElementById('file-list').style.display = 'none';
+    }
+}
+
+// Test de transcription par batch
+function testBatchTranscription() {
+    if (selectedFiles.length === 0) {
+        alert('Veuillez sélectionner des fichiers audio.');
+        return;
+    }
+    
+    const loading = document.getElementById('loading');
+    const resultsArea = document.getElementById('results-area');
+    const batchBtn = document.getElementById('batch-btn');
+    
+    // Afficher le loading
+    loading.style.display = 'block';
+    resultsArea.style.display = 'none';
+    batchBtn.disabled = true;
+    
+    // Préparer les données
+    const formData = new FormData();
+    selectedFiles.forEach(file => {
+        formData.append('audio_files', file);
+    });
+    
+    // Envoyer la requête
+    fetch('/test-batch/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        loading.style.display = 'none';
+        batchBtn.disabled = false;
+        
+        if (data.success) {
+            displayBatchResults(data.results);
+        } else {
+            alert(`Erreur : ${data.error}`);
+        }
+        
+        resultsArea.style.display = 'block';
+    })
+    .catch(error => {
+        loading.style.display = 'none';
+        batchBtn.disabled = false;
+        
+        alert(`Erreur de connexion : ${error.message}`);
+    });
+}
+
+// Affichage des résultats batch
+function displayBatchResults(results) {
+    const resultsBody = document.getElementById('results-body');
+    
+    resultsBody.innerHTML = '';
+    
+    results.forEach(result => {
+        const row = document.createElement('tr');
+        
+        const statusClass = result.status === 'success' ? 'status-success' : 'status-error';
+        const statusText = result.status === 'success' ? '✅ Succès' : '❌ Erreur';
+        
+        row.innerHTML = `
+            <td><strong>${result.filename}</strong></td>
+            <td class="${statusClass}">${statusText}</td>
+            <td>${result.transcription || result.error || 'Aucun résultat'}</td>
+        `;
+        
+        resultsBody.appendChild(row);
+    });
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,719 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Description des symptômes — Rassurez-moi{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Section pour la page symptômes */
+  .symptomes-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .symptomes-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical-pattern" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="2" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23medical-pattern)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Section principale */
+  .symptomes-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 60vh;
+  }
+  
+  .symptomes-container {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .symptomes-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  /* Audio explicatif */
+  .audio-explicatif {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .audio-explicatif:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+  }
+  
+  .audio-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+  
+  .audio-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+  }
+  
+  .audio-text {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  /* Messages */
+  .message-container {
+    margin-bottom: 2rem;
+  }
+  
+  .message {
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: none;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+  
+  .message.info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    color: #1e40af;
+  }
+  
+  .message.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    border: 2px solid rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+  }
+  
+  /* Formulaire */
+  .form-group {
+    margin-bottom: 2rem;
+  }
+  
+  .form-label {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.1rem;
+  }
+  
+  .form-label i {
+    color: #667eea;
+    font-size: 1.2rem;
+  }
+  
+  .form-control {
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 15px;
+    padding: 1.2rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+  }
+  
+  .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: white;
+  }
+  
+  .form-control::placeholder {
+    color: #94a3b8;
+  }
+  
+  /* Enregistrement vocal */
+  .recording-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .record-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    border-radius: 50px;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  
+  .record-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+  }
+  
+  .record-btn.recording {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  .record-status {
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ef4444;
+    font-weight: 600;
+  }
+  
+  .recording-indicator .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ef4444;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Bouton d'envoi */
+  .submit-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    border-radius: 50px;
+    padding: 1.2rem 3rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+  }
+  
+  .submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  /* Section de réponse */
+  .reponse-section {
+    margin-top: 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 25px;
+    padding: 3rem;
+    color: white;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .reponse-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="reponse-pattern" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23reponse-pattern)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .reponse-content {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .reponse-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .reponse-section h5 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .reponse-text {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    line-height: 1.6;
+  }
+  
+  .reponse-audio-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  
+  .reponse-audio-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+  }
+  
+  .audio-status {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    margin-left: 1rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .symptomes-container {
+      padding: 2rem;
+    }
+    
+    .reponse-section {
+      padding: 2rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .symptomes-container {
+      padding: 1.5rem;
+    }
+    
+    .reponse-section {
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="symptomes-hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <i class="fas fa-stethoscope"></i>
+        Décrivez vos symptômes
+      </h1>
+      <p class="hero-subtitle">
+        Décrivez vos maux en bambara ou français et recevez des conseils médicaux personnalisés instantanément
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section principale -->
+<section class="symptomes-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="symptomes-container">
+          <!-- Audio explicatif -->
+          <div class="audio-explicatif">
+            <button class="audio-btn" id="symptomes-audio-btn" title="Écouter l'explication">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <div class="audio-text">
+              <strong>Écoutez notre guide</strong><br>
+              <small>Découvrez comment décrire vos symptômes efficacement</small>
+            </div>
+            <audio id="symptomes-audio" src="{% static 'core/audio/symptomes_explain.mp3' %}"></audio>
+          </div>
+          
+          <!-- Messages d'information -->
+          <div id="info-message" class="message info" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span id="info-text"></span>
+          </div>
+          
+          <!-- Messages d'erreur -->
+          <div id="error-message" class="message error" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="error-text"></span>
+          </div>
+          
+          <!-- Formulaire -->
+          <form method="post" enctype="multipart/form-data" id="symptome-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+              <label for="symptomes_bam" class="form-label">
+                <i class="fas fa-edit"></i>
+                Décrivez vos maux (en bambara ou français)
+              </label>
+              <textarea 
+                class="form-control" 
+                id="symptomes_bam" 
+                name="symptomes_bam" 
+                rows="5" 
+                placeholder="Exemple: N bɛ ɲɛnɛn, n bɛ ɲɛnɛn, n bɛ ɲɛnɛn... ou Je me sens fatigué, j'ai mal à la tête..."
+              ></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-microphone"></i>
+                Ou enregistrez votre voix
+              </label>
+              <div class="recording-section">
+                <button type="button" class="record-btn" id="record-btn">
+                  <i class="fas fa-microphone"></i>
+                  <span id="record-text">Enregistrer ma voix</span>
+                </button>
+                <div class="record-status">
+                  <span id="record-status" class="text-muted"></span>
+                  <div id="recording-indicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <span>Enregistrement en cours...</span>
+                  </div>
+                </div>
+              </div>
+              <input type="file" id="audio-file" name="audio" accept="audio/*" hidden>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submit-btn">
+              <i class="fas fa-paper-plane"></i>
+              Envoyer ma demande
+            </button>
+          </form>
+        </div>
+        
+        <!-- Section de réponse -->
+        <div id="reponse-section" class="reponse-section" style="display:none;">
+          <div class="reponse-content">
+            <h3 class="reponse-title">
+              <i class="fas fa-stethoscope"></i>
+              Réponse médicale
+            </h3>
+            
+            <div class="mb-4">
+              <h5><i class="fas fa-user"></i> Vos symptômes :</h5>
+              <div class="reponse-text" id="symptomes-display"></div>
+            </div>
+            
+            <div class="mb-4">
+              <h5><i class="fas fa-heart"></i> Conseils médicaux :</h5>
+              <div class="reponse-text" id="reponse-bam"></div>
+            </div>
+            
+            <div class="d-flex align-items-center">
+              <button class="reponse-audio-btn" id="reponse-audio-btn" title="Écouter la réponse">
+                <i class="fas fa-volume-up"></i>
+                Écouter la réponse
+              </button>
+              <span id="audio-status" class="audio-status"></span>
+            </div>
+            <audio id="reponse-audio" controls class="mt-3" style="display: none;"></audio>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Variables globales
+  let mediaRecorder, audioChunks = [];
+  let isRecording = false;
+  
+  // Éléments DOM
+  const recordBtn = document.getElementById('record-btn');
+  const recordText = document.getElementById('record-text');
+  const recordStatus = document.getElementById('record-status');
+  const recordingIndicator = document.getElementById('recording-indicator');
+  const audioFileInput = document.getElementById('audio-file');
+  const form = document.getElementById('symptome-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const infoMessage = document.getElementById('info-message');
+  const errorMessage = document.getElementById('error-message');
+  const reponseSection = document.getElementById('reponse-section');
+  
+  // Audio explicatif
+  document.getElementById('symptomes-audio-btn').onclick = function() {
+    var audio = document.getElementById('symptomes-audio');
+    audio.play();
+  };
+
+  // Fonction pour afficher les messages
+  function showMessage(type, text) {
+    if (type === 'info') {
+      infoMessage.style.display = 'block';
+      document.getElementById('info-text').textContent = text;
+      errorMessage.style.display = 'none';
+    } else if (type === 'error') {
+      errorMessage.style.display = 'block';
+      document.getElementById('error-text').textContent = text;
+      infoMessage.style.display = 'none';
+    }
+  }
+
+  // Fonction pour masquer les messages
+  function hideMessages() {
+    infoMessage.style.display = 'none';
+    errorMessage.style.display = 'none';
+  }
+
+  // Enregistrement vocal
+  recordBtn.onclick = async function() {
+    if (isRecording) {
+      // Arrêter l'enregistrement
+      mediaRecorder.stop();
+      isRecording = false;
+      recordText.textContent = 'Enregistrer ma voix';
+      recordStatus.textContent = 'Enregistrement terminé.';
+      recordingIndicator.style.display = 'none';
+      recordBtn.classList.remove('recording');
+      return;
+    }
+    
+    // Vérifier le support de l'enregistrement
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showMessage('error', 'Enregistrement audio non supporté sur ce navigateur.');
+      return;
+    }
+    
+    try {
+      // Demander l'autorisation d'accès au micro
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Configurer l'enregistreur
+      mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      audioChunks = [];
+      
+      mediaRecorder.ondataavailable = e => {
+        audioChunks.push(e.data);
+      };
+      
+      mediaRecorder.onstop = e => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const file = new File([audioBlob], 'symptomes.webm', { type: 'audio/webm' });
+        
+        // Créer un DataTransfer pour simuler un input file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        audioFileInput.files = dataTransfer.files;
+        
+        recordStatus.textContent = 'Audio prêt à être envoyé.';
+        showMessage('info', 'Audio enregistré avec succès. Vous pouvez maintenant envoyer votre demande.');
+      };
+      
+      // Démarrer l'enregistrement
+      mediaRecorder.start();
+      isRecording = true;
+      recordText.textContent = 'Arrêter l\'enregistrement';
+      recordStatus.textContent = 'Enregistrement en cours...';
+      recordingIndicator.style.display = 'flex';
+      recordBtn.classList.add('recording');
+      hideMessages();
+      
+    } catch (error) {
+      console.error('Erreur lors de l\'accès au microphone:', error);
+      showMessage('error', 'Impossible d\'accéder au microphone. Vérifiez les permissions.');
+    }
+  };
+
+  // Soumission du formulaire
+  form.onsubmit = async function(e) {
+    e.preventDefault();
+    
+    const symptomesText = document.getElementById('symptomes_bam').value.trim();
+    const hasAudio = audioFileInput.files.length > 0;
+    
+    if (!symptomesText && !hasAudio) {
+      showMessage('error', 'Veuillez fournir du texte ou un enregistrement audio.');
+      return;
+    }
+    
+    // Préparer les données
+    const formData = new FormData();
+    if (symptomesText) {
+      formData.append('symptomes_bam', symptomesText);
+    }
+    if (hasAudio) {
+      formData.append('audio', audioFileInput.files[0]);
+    }
+    
+    // Désactiver le bouton pendant le traitement
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement en cours...';
+    hideMessages();
+    
+    try {
+      const response = await fetch('{% url "pipeline" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Afficher la réponse
+        document.getElementById('symptomes-display').textContent = result.symptomes_bam;
+        document.getElementById('reponse-bam').textContent = result.reponse_bam;
+        reponseSection.style.display = 'block';
+        
+        // Gérer l'audio de réponse
+        if (result.audio_url) {
+          const audio = document.getElementById('reponse-audio');
+          audio.src = result.audio_url;
+          audio.style.display = 'block';
+          document.getElementById('audio-status').textContent = 'Audio disponible';
+        }
+        
+        // Faire défiler vers la réponse
+        reponseSection.scrollIntoView({ behavior: 'smooth' });
+        
+      } else {
+        showMessage('error', result.error || 'Une erreur est survenue.');
+        if (result.reponse_bam) {
+          document.getElementById('reponse-bam').textContent = result.reponse_bam;
+          reponseSection.style.display = 'block';
+        }
+      }
+      
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi:', error);
+      showMessage('error', 'Erreur de connexion. Vérifiez votre connexion internet.');
+    } finally {
+      // Réactiver le bouton
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer ma demande';
+    }
+  };
+
+  // Lecture audio réponse
+  document.getElementById('reponse-audio-btn').onclick = function() {
+    var audio = document.getElementById('reponse-audio');
+    if (audio.src) {
+      audio.play();
+      document.getElementById('audio-status').textContent = 'Lecture en cours...';
+      audio.onended = function() {
+        document.getElementById('audio-status').textContent = 'Audio disponible';
+      };
+    } else {
+      showMessage('error', 'Aucun audio disponible pour cette réponse.');
+    }
+  };
+</script>
+{% endblock %} 

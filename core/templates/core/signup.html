@@ -1,0 +1,351 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Inscription — Rassurez-moi{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/medical-auth.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="medical-auth-container">
+  <div class="medical-auth-wrapper">
+    <!-- Section Formulaire -->
+    <div class="medical-form-section">
+      <div class="medical-form-container">
+        <div class="medical-form-header">
+          <div class="brand-container">
+            <img src="{% static 'core/images/logo.png' %}" alt="Logo Rassurez-moi" class="medical-logo">
+            <div class="brand-text">
+              <h1 class="medical-brand-title">Rassurez-moi</h1>
+              <p class="medical-brand-subtitle">Assistance médicale intelligente</p>
+            </div>
+          </div>
+        </div>
+        
+        <form method="post" class="medical-form">
+          {% csrf_token %}
+          <h2 class="medical-form-title">Créer votre compte</h2>
+          <p class="medical-form-subtitle">Rejoignez des milliers d'utilisateurs qui font confiance à Rassurez-moi</p>
+          
+          {% if form.errors %}
+            <div class="medical-alert medical-alert-danger">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Veuillez corriger les erreurs ci-dessous</span>
+            </div>
+          {% endif %}
+          
+          <div class="medical-form-group">
+            <label for="{{ form.username.id_for_label }}" class="medical-form-label">
+              <i class="fas fa-user"></i>
+              Nom d'utilisateur
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="medical-error-message">{{ form.username.errors.0 }}</div>
+            {% endif %}
+            {% if form.username.help_text %}
+              <div class="medical-help-text">{{ form.username.help_text }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="medical-form-group">
+            <label for="{{ form.email.id_for_label }}" class="medical-form-label">
+              <i class="fas fa-envelope"></i>
+              Adresse e-mail
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="medical-error-message">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="medical-form-group">
+            <label for="{{ form.first_name.id_for_label }}" class="medical-form-label">
+              <i class="fas fa-user-circle"></i>
+              Prénom (optionnel)
+            </label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              <div class="medical-error-message">{{ form.first_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="medical-form-group">
+            <label for="{{ form.last_name.id_for_label }}" class="medical-form-label">
+              <i class="fas fa-user-circle"></i>
+              Nom (optionnel)
+            </label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              <div class="medical-error-message">{{ form.last_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="medical-form-group">
+            <label for="{{ form.password1.id_for_label }}" class="medical-form-label">
+              <i class="fas fa-lock"></i>
+              Mot de passe
+            </label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+              <div class="medical-error-message">{{ form.password1.errors.0 }}</div>
+            {% endif %}
+            {% if form.password1.help_text %}
+              <div class="medical-help-text">{{ form.password1.help_text }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="medical-form-group">
+            <label for="{{ form.password2.id_for_label }}" class="medical-form-label">
+              <i class="fas fa-lock"></i>
+              Confirmer le mot de passe
+            </label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+              <div class="medical-error-message">{{ form.password2.errors.0 }}</div>
+            {% endif %}
+            {% if form.password2.help_text %}
+              <div class="medical-help-text">{{ form.password2.help_text }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="medical-form-group">
+            <label class="medical-form-label">
+              <input type="checkbox" class="medical-checkbox" name="medical_consent" id="medical_consent" required>
+              <span style="margin-left: 8px; font-weight: 500; color: var(--medical-gray-600);">
+                J'accepte que mes données soient utilisées pour améliorer les services médicaux
+              </span>
+            </label>
+          </div>
+          
+          <button type="submit" class="medical-btn">
+            <i class="fas fa-user-plus"></i>
+            Créer mon compte
+          </button>
+          
+          <div class="medical-form-footer">
+            <p class="medical-form-footer-text">
+              Vous avez déjà un compte ? 
+              <a href="{% url 'login' %}" class="medical-form-link">Se connecter</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Section Informations -->
+    <div class="medical-info-section">
+      <div class="medical-info-content">
+        <div class="medical-welcome-header">
+          <h1 class="medical-welcome-title">Rejoignez Rassurez-moi</h1>
+          <p class="medical-welcome-subtitle">Votre santé, notre priorité</p>
+        </div>
+        
+        <div class="medical-features-list">
+          <div class="medical-feature-item">
+            <div class="medical-feature-icon">
+              <i class="fas fa-microphone-alt"></i>
+            </div>
+            <div class="medical-feature-content">
+              <h3>Diagnostic vocal</h3>
+              <p>Décrivez vos symptômes en bambara et recevez des conseils médicaux personnalisés</p>
+            </div>
+          </div>
+          
+          <div class="medical-feature-item">
+            <div class="medical-feature-icon">
+              <i class="fas fa-hospital"></i>
+            </div>
+            <div class="medical-feature-content">
+              <h3>Centres de santé</h3>
+              <p>Trouvez les centres médicaux les plus proches avec géolocalisation précise</p>
+            </div>
+          </div>
+          
+          <div class="medical-feature-item">
+            <div class="medical-feature-icon">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div class="medical-feature-content">
+              <h3>Rappels médicaux</h3>
+              <p>Ne manquez plus vos prises de médicaments avec nos rappels personnalisés</p>
+            </div>
+          </div>
+          
+          <div class="medical-feature-item">
+            <div class="medical-feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="medical-feature-content">
+              <h3>Confidentialité garantie</h3>
+              <p>Vos données médicales sont protégées et sécurisées selon les standards internationaux</p>
+            </div>
+          </div>
+          
+          <div class="medical-feature-item">
+            <div class="medical-feature-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="medical-feature-content">
+              <h3>Accessible partout</h3>
+              <p>Accédez à vos informations médicales depuis n'importe quel appareil</p>
+            </div>
+          </div>
+          
+          <div class="medical-feature-item">
+            <div class="medical-feature-icon">
+              <i class="fas fa-heart"></i>
+            </div>
+            <div class="medical-feature-content">
+              <h3>Suivi personnalisé</h3>
+              <p>Bénéficiez d'un suivi médical adapté à vos besoins spécifiques</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="medical-stats-preview">
+          <div class="medical-stat-preview-item">
+            <div class="medical-stat-number">5000+</div>
+            <div class="medical-stat-label">Utilisateurs actifs</div>
+          </div>
+          <div class="medical-stat-preview-item">
+            <div class="medical-stat-number">99.9%</div>
+            <div class="medical-stat-label">Disponibilité</div>
+          </div>
+          <div class="medical-stat-preview-item">
+            <div class="medical-stat-number">4.8★</div>
+            <div class="medical-stat-label">Note utilisateurs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Animation d'entrée pour les éléments
+document.addEventListener('DOMContentLoaded', function() {
+  const formElements = document.querySelectorAll('.medical-form-group, .medical-btn, .medical-form-footer');
+  const featureItems = document.querySelectorAll('.medical-feature-item');
+  
+  // Animation des éléments du formulaire
+  formElements.forEach((element, index) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      element.style.transition = 'all 0.6s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, 200 + (index * 100));
+  });
+  
+  // Animation des fonctionnalités
+  featureItems.forEach((item, index) => {
+    item.style.opacity = '0';
+    item.style.transform = 'translateX(-20px)';
+    setTimeout(() => {
+      item.style.transition = 'all 0.6s ease';
+      item.style.opacity = '1';
+      item.style.transform = 'translateX(0)';
+    }, 500 + (index * 150));
+  });
+  
+  // Effet de focus amélioré pour les inputs
+  const inputs = document.querySelectorAll('.medical-input');
+  inputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      this.parentElement.style.transform = 'scale(1.02)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.parentElement.style.transform = 'scale(1)';
+    });
+  });
+  
+  // Validation en temps réel
+  const form = document.querySelector('.medical-form');
+  const submitBtn = document.querySelector('.medical-btn');
+  const requiredFields = ['username', 'email', 'password1', 'password2'];
+  
+  function validateForm() {
+    let isValid = true;
+    requiredFields.forEach(fieldName => {
+      const field = form.querySelector(`[name="${fieldName}"]`);
+      if (!field || !field.value.trim()) {
+        isValid = false;
+      }
+    });
+    
+    const consent = form.querySelector('#medical_consent');
+    if (!consent || !consent.checked) {
+      isValid = false;
+    }
+    
+    if (isValid) {
+      submitBtn.style.opacity = '1';
+      submitBtn.style.transform = 'translateY(0)';
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.style.opacity = '0.7';
+      submitBtn.style.transform = 'translateY(2px)';
+      submitBtn.disabled = true;
+    }
+  }
+  
+  form.addEventListener('input', validateForm);
+  form.addEventListener('change', validateForm);
+  
+  // Validation initiale
+  validateForm();
+  
+  // Effet de force du mot de passe
+  const password1 = form.querySelector('[name="password1"]');
+  const password2 = form.querySelector('[name="password2"]');
+  
+  if (password1 && password2) {
+    password1.addEventListener('input', function() {
+      const strength = calculatePasswordStrength(this.value);
+      updatePasswordStrengthIndicator(strength);
+    });
+    
+    password2.addEventListener('input', function() {
+      const password1Value = password1.value;
+      const password2Value = this.value;
+      
+      if (password1Value && password2Value) {
+        if (password1Value === password2Value) {
+          this.style.borderColor = 'var(--medical-success)';
+          this.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.1)';
+        } else {
+          this.style.borderColor = 'var(--medical-danger)';
+          this.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
+        }
+      }
+    });
+  }
+  
+  function calculatePasswordStrength(password) {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    return strength;
+  }
+  
+  function updatePasswordStrengthIndicator(strength) {
+    const colors = ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#16a34a'];
+    const labels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+    
+    if (password1) {
+      password1.style.borderColor = colors[strength - 1] || '#e2e8f0';
+      password1.style.boxShadow = `0 0 0 4px ${colors[strength - 1]}20` || 'none';
+    }
+  }
+});
+</script>
+{% endblock %}

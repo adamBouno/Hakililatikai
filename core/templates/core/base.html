@@ -1,0 +1,644 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Rassurez-moi — Assistance médicale intelligente{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="{% static 'core/css/style.css' %}" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+  <style>
+    /* Barre supérieure d'informations */
+    .top-info-bar {
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .top-info-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .top-info-bar .welcome-text {
+      font-weight: 500;
+      color: #e2e8f0;
+    }
+    
+    .top-info-bar .contact-info {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .top-info-bar .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.2s;
+      font-weight: 500;
+    }
+    
+    .top-info-bar .contact-item:hover {
+      color: #f1f5f9;
+    }
+    
+    /* Navbar principale médicale */
+    .navbar-medical {
+      background: linear-gradient(135deg, #1e40af 0%, #1e293b 100%);
+      box-shadow: 0 4px 20px rgba(30,41,59,0.2);
+      font-family: 'Inter', sans-serif;
+      padding: 0;
+      position: relative;
+    }
+    
+    .navbar-medical::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100%;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+      z-index: 1;
+    }
+    
+    .navbar-medical .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+    }
+    
+    .navbar-medical .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+    
+    .navbar-medical .brand-logo {
+      height: 45px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+    }
+    
+    .navbar-medical .brand-subtitle {
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-top: -0.3rem;
+    }
+    
+    .navbar-medical .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .navbar-medical .nav-item {
+      margin: 0;
+    }
+    
+    .navbar-medical .nav-link {
+      color: #fff !important;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.8rem 1.2rem !important;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .navbar-medical .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background: #fff;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    
+    .navbar-medical .nav-link:hover::after,
+    .navbar-medical .nav-link.active::after {
+      width: 80%;
+    }
+    
+    .navbar-medical .nav-link:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+    
+    .navbar-medical .btn-appointment {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+    }
+    
+    .navbar-medical .btn-appointment:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16,185,129,0.4);
+    }
+    
+    /* Menu utilisateur stylé */
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .user-menu-dropdown {
+      position: relative;
+    }
+    
+    .user-menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      min-width: 180px;
+    }
+    
+    .user-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      color: #fff;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+    }
+    
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      flex: 1;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #fff;
+      line-height: 1.2;
+    }
+    
+    .user-status {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
+    }
+    
+    .dropdown-arrow {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      transition: transform 0.3s ease;
+    }
+    
+    .user-menu-btn[aria-expanded="true"] .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+    
+    .user-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      min-width: 250px;
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      z-index: 1000;
+      animation: dropdownFadeIn 0.3s ease;
+      display: none;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+    
+    .user-dropdown-menu.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @keyframes dropdownFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .dropdown-header {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    
+    .user-welcome {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: #1e293b;
+      font-weight: 600;
+    }
+    
+    .user-welcome i {
+      color: #667eea;
+      font-size: 1.2rem;
+    }
+    
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem 1rem;
+      color: #64748b;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    
+    .dropdown-item:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      transform: translateX(5px);
+    }
+    
+    .dropdown-item i {
+      width: 16px;
+      text-align: center;
+      color: #667eea;
+    }
+    
+    .logout-item {
+      color: #ef4444 !important;
+    }
+    
+    .logout-item:hover {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #ef4444 !important;
+      transform: translateX(5px);
+    }
+    
+    .logout-item i {
+      color: #ef4444 !important;
+    }
+    
+    /* Style pour le bouton de déconnexion dans le formulaire */
+    .dropdown-item.logout-item {
+      background: none !important;
+      border: none !important;
+      width: 100% !important;
+      text-align: left !important;
+      cursor: pointer !important;
+      padding: 0.8rem 1rem !important;
+      color: #ef4444 !important;
+      text-decoration: none !important;
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
+      font-weight: 500 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.8rem !important;
+      font-family: inherit !important;
+      font-size: inherit !important;
+    }
+    
+    .dropdown-item.logout-item:hover {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #ef4444 !important;
+      transform: translateX(5px) !important;
+    }
+    
+    .dropdown-divider {
+      margin: 0.5rem 0;
+      border-color: rgba(226, 232, 240, 0.8);
+    }
+    
+    /* Bouton de connexion stylé */
+    .auth-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .login-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      backdrop-filter: blur(10px);
+    }
+    
+    .login-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    
+    /* Bouton de déconnexion visible */
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      transform: translateY(-1px);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 991px) {
+      .navbar-medical .navbar-collapse {
+        background: rgba(37,99,235,0.95);
+        border-radius: 1rem;
+        margin-top: 1rem;
+        padding: 1rem;
+        backdrop-filter: blur(10px);
+      }
+      
+      .navbar-medical .navbar-nav {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .navbar-medical .nav-link {
+        padding: 0.8rem 1rem !important;
+        border-radius: 0.5rem;
+      }
+      
+      .navbar-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+        width: 100%;
+      }
+      
+      .user-menu-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .user-dropdown-menu {
+        position: static;
+        width: 100%;
+        margin-top: 0.5rem;
+        box-shadow: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      .navbar-medical .btn-appointment {
+        margin-top: 0.5rem;
+        width: 100%;
+        text-align: center;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .top-info-bar .contact-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-end;
+      }
+      
+      .navbar-medical .navbar-brand {
+        font-size: 1.4rem;
+      }
+      
+      .navbar-medical .brand-logo {
+        height: 35px;
+      }
+    }
+  </style>
+</head>
+<body class="medical-theme">
+
+  <!-- Navbar principale médicale -->
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-medical">
+      <div class="container">
+        <a href="{% url 'home' %}" class="navbar-brand">
+          <img src="{% static 'core/images/logo.png' %}" alt="Logo Rassurez-moi" class="brand-logo">
+          <div>
+            <div>RASSUREZ-MOI</div>
+            <div class="brand-subtitle">ASSISTANCE MÉDICALE INTELLIGENTE</div>
+          </div>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Accueil</a>
+            </li>
+            {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'articles' %}active{% endif %}" href="{% url 'articles' %}">Conseils</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'centres' %}active{% endif %}" href="{% url 'centres' %}">Centres</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'pipeline' %}active{% endif %}" href="{% url 'pipeline' %}">Symptômes</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'reminders' %}active{% endif %}" href="{% url 'reminders' %}">Rappels</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}" style="color: #fbbf24 !important;">
+                  <i class="fas fa-lock"></i> Connexion requise
+                </a>
+              </li>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">À propos</a>
+            </li>
+          </ul>
+          
+          <div class="navbar-actions">
+            {% if user.is_authenticated %}
+              <!-- Bouton de déconnexion visible -->
+              <form method="post" action="{% url 'logout' %}" style="margin: 0; padding: 0; display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="auth-btn logout-btn">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Déconnexion</span>
+                </button>
+              </form>
+              
+              <div class="user-menu-dropdown">
+                <button class="user-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="user-info">
+                    <span class="user-name">{{ user.username }}</span>
+                    <span class="user-status">Connecté</span>
+                  </div>
+                  <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <ul class="user-dropdown-menu">
+                  <li class="dropdown-header">
+                    <div class="user-welcome">
+                      <i class="fas fa-user-circle"></i>
+                      <span>Bonjour, {{ user.username }}</span>
+                    </div>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'profile' %}">
+                      <i class="fas fa-user"></i>
+                      <span>Mon profil</span>
+                    </a>
+                  </li>
+                  
+                </ul>
+              </div>
+            {% else %}
+              <a href="{% url 'login' %}" class="auth-btn login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Connexion</span>
+              </a>
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+              <a href="{% url 'pipeline' %}" class="btn-appointment">
+                <i class="fas fa-stethoscope"></i>
+                <span>Consultation</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content py-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Gestion de la fermeture automatique du menu utilisateur
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fermer le dropdown quand on clique ailleurs
+      document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.user-menu-dropdown');
+        dropdowns.forEach(function(dropdown) {
+          const dropdownMenu = dropdown.querySelector('.user-dropdown-menu');
+          const dropdownButton = dropdown.querySelector('.user-menu-btn');
+          
+          // Si on clique en dehors du dropdown, on le ferme
+          if (!dropdown.contains(event.target)) {
+            dropdownMenu.classList.remove('show');
+            dropdownButton.setAttribute('aria-expanded', 'false');
+            dropdownButton.classList.remove('show');
+          }
+        });
+      });
+      
+      // Gestion du clic sur le bouton dropdown
+      const dropdownButtons = document.querySelectorAll('.user-menu-btn');
+      dropdownButtons.forEach(function(button) {
+        button.addEventListener('click', function(event) {
+          event.stopPropagation();
+          const dropdown = this.closest('.user-menu-dropdown');
+          const dropdownMenu = dropdown.querySelector('.user-dropdown-menu');
+          const isExpanded = this.getAttribute('aria-expanded') === 'true';
+          
+          // Fermer tous les autres dropdowns
+          document.querySelectorAll('.user-dropdown-menu').forEach(function(menu) {
+            menu.classList.remove('show');
+          });
+          document.querySelectorAll('.user-menu-btn').forEach(function(btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.classList.remove('show');
+          });
+          
+          // Toggle du dropdown actuel
+          if (!isExpanded) {
+            dropdownMenu.classList.add('show');
+            this.setAttribute('aria-expanded', 'true');
+            this.classList.add('show');
+          }
+        });
+      });
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

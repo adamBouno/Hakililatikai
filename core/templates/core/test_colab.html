@@ -1,0 +1,324 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Test Transcription Colab{% endblock %}
+
+{% block extra_css %}
+<style>
+    .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .status-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .status-success {
+        border-color: #28a745;
+        background-color: #d4edda;
+    }
+    
+    .status-error {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+    }
+    
+    .upload-area {
+        border: 2px dashed #007bff;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        margin: 20px 0;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        border-color: #0056b3;
+        background: #e9ecef;
+    }
+    
+    .upload-area.dragover {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+    
+    .result-area {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        min-height: 100px;
+    }
+    
+    .btn-test {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+    }
+    
+    .btn-test:hover {
+        background: #0056b3;
+    }
+    
+    .btn-test:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    .loading {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="test-container">
+    <h1>🧪 Test Transcription Colab</h1>
+    
+    <!-- Test de santé du serveur -->
+    <div class="status-card" id="health-status">
+        <h3>🔍 État du serveur Colab</h3>
+        <p>Vérification de la connexion au serveur Colab...</p>
+        <button class="btn-test" onclick="checkHealth()">Vérifier la connexion</button>
+        <div id="health-result"></div>
+    </div>
+    
+    <!-- Interface de test audio -->
+    <div class="status-card">
+        <h3>🎤 Test de transcription</h3>
+        <p>Enregistrez ou sélectionnez un fichier audio pour tester la transcription :</p>
+        
+        <div class="upload-area" id="upload-area">
+            <div id="upload-text">
+                <i class="fas fa-microphone" style="font-size: 48px; color: #007bff;"></i>
+                <p>Cliquez pour sélectionner un fichier audio ou glissez-déposez</p>
+                <p><small>Formats supportés : WAV, MP3, M4A, FLAC</small></p>
+            </div>
+            <input type="file" id="audio-file" accept="audio/*" style="display: none;">
+        </div>
+        
+        <button class="btn-test" id="test-btn" onclick="testTranscription()" disabled>
+            Tester la transcription
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Transcription en cours...</p>
+        </div>
+        
+        <div class="result-area" id="result-area" style="display: none;">
+            <h4>📝 Résultat de la transcription :</h4>
+            <div id="transcription-result"></div>
+        </div>
+    </div>
+    
+    <!-- Informations techniques -->
+    <div class="status-card">
+        <h3>⚙️ Informations techniques</h3>
+        <ul>
+            <li><strong>Modèle :</strong> RobotsMali/stt-bm-quartznet15x5-V0</li>
+            <li><strong>Format audio :</strong> Mono, 16kHz, WAV</li>
+            <li><strong>Langue :</strong> Bambara</li>
+            <li><strong>Serveur :</strong> Google Colab</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let selectedFile = null;
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    setupUploadArea();
+    checkHealth(); // Vérifier automatiquement au chargement
+});
+
+// Configuration de la zone de upload
+function setupUploadArea() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('audio-file');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+}
+
+// Gestion de la sélection de fichier
+function handleFileSelect(file) {
+    if (!file.type.startsWith('audio/')) {
+        alert('Veuillez sélectionner un fichier audio valide.');
+        return;
+    }
+    
+    selectedFile = file;
+    document.getElementById('upload-text').innerHTML = `
+        <i class="fas fa-check" style="font-size: 48px; color: #28a745;"></i>
+        <p><strong>Fichier sélectionné :</strong> ${file.name}</p>
+        <p><small>Taille : ${(file.size / 1024 / 1024).toFixed(2)} MB</small></p>
+    `;
+    document.getElementById('test-btn').disabled = false;
+}
+
+// Vérification de la santé du serveur
+function checkHealth() {
+    const healthResult = document.getElementById('health-result');
+    healthResult.innerHTML = '<p>Vérification en cours...</p>';
+    
+    fetch('/test-colab-health/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                healthResult.innerHTML = `
+                    <div class="status-success">
+                        <h4>✅ Serveur Colab accessible</h4>
+                        <p><strong>Status :</strong> ${data.status}</p>
+                        <p><strong>Modèle chargé :</strong> ${data.model_loaded ? 'Oui' : 'Non'}</p>
+                        <p><strong>Device :</strong> ${data.device}</p>
+                        <p><strong>Version :</strong> ${data.version}</p>
+                    </div>
+                `;
+            } else {
+                healthResult.innerHTML = `
+                    <div class="status-error">
+                        <h4>❌ Erreur de connexion</h4>
+                        <p><strong>Erreur :</strong> ${data.error}</p>
+                        <p>Vérifiez que le serveur Colab est démarré et accessible.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            healthResult.innerHTML = `
+                <div class="status-error">
+                    <h4>❌ Erreur de connexion</h4>
+                    <p><strong>Erreur :</strong> ${error.message}</p>
+                    <p>Vérifiez votre connexion internet et l'URL Colab.</p>
+                </div>
+            `;
+        });
+}
+
+// Test de transcription
+function testTranscription() {
+    if (!selectedFile) {
+        alert('Veuillez sélectionner un fichier audio.');
+        return;
+    }
+    
+    const loading = document.getElementById('loading');
+    const resultArea = document.getElementById('result-area');
+    const transcriptionResult = document.getElementById('transcription-result');
+    const testBtn = document.getElementById('test-btn');
+    
+    // Afficher le loading
+    loading.style.display = 'block';
+    resultArea.style.display = 'none';
+    testBtn.disabled = true;
+    
+    // Préparer les données
+    const formData = new FormData();
+    formData.append('audio', selectedFile);
+    
+    // Envoyer la requête
+    fetch('/test-transcription-api/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        loading.style.display = 'none';
+        testBtn.disabled = false;
+        
+        if (data.success) {
+            transcriptionResult.innerHTML = `
+                <div class="status-success">
+                    <h4>✅ Transcription réussie</h4>
+                    <p><strong>Texte transcrit :</strong></p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                        "${data.transcription}"
+                    </div>
+                    <p><strong>Modèle :</strong> ${data.model}</p>
+                    <p><strong>Status :</strong> ${data.status}</p>
+                </div>
+            `;
+        } else {
+            transcriptionResult.innerHTML = `
+                <div class="status-error">
+                    <h4>❌ Erreur de transcription</h4>
+                    <p><strong>Erreur :</strong> ${data.error}</p>
+                    ${data.details ? `<p><strong>Détails :</strong> ${data.details}</p>` : ''}
+                </div>
+            `;
+        }
+        
+        resultArea.style.display = 'block';
+    })
+    .catch(error => {
+        loading.style.display = 'none';
+        testBtn.disabled = false;
+        
+        transcriptionResult.innerHTML = `
+            <div class="status-error">
+                <h4>❌ Erreur de connexion</h4>
+                <p><strong>Erreur :</strong> ${error.message}</p>
+                <p>Vérifiez votre connexion internet et l'état du serveur Colab.</p>
+            </div>
+        `;
+        
+        resultArea.style.display = 'block';
+    });
+}
+</script>
+{% endblock %} 

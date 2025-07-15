@@ -1,0 +1,497 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Mon Profil — Rassurez-moi{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Section pour la page profil */
+  .profile-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="profile-pattern" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="2" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23profile-pattern)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Section principale */
+  .profile-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+  
+  .profile-container {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .profile-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  /* Informations utilisateur */
+  .user-info {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .user-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .user-avatar {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+  }
+  
+  .user-name {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .user-email {
+    color: #64748b;
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .stat-item {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  /* Historique des recherches */
+  .history-section {
+    margin-top: 3rem;
+  }
+  
+  .history-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .history-title i {
+    color: #667eea;
+  }
+  
+  .search-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .search-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .search-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+  
+  .search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .search-date {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  .search-symptoms {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  
+  .search-response {
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .search-response-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .search-response-text {
+    color: #64748b;
+    line-height: 1.6;
+  }
+  
+  .empty-history {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    border: 2px dashed rgba(102, 126, 234, 0.2);
+  }
+  
+  .empty-history i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  .empty-history h4 {
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-history p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+  
+  /* Actions */
+  .actions-section {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .action-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    border-color: rgba(102, 126, 234, 0.3);
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .action-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  }
+  
+  .action-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+  
+  .action-description {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .profile-container {
+      padding: 2rem;
+    }
+    
+    .user-stats {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    .actions-section {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .profile-container {
+      padding: 1.5rem;
+    }
+    
+    .user-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="profile-hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <i class="fas fa-user"></i>
+        Mon Profil
+      </h1>
+      <p class="hero-subtitle">
+        Gérez vos informations personnelles et consultez votre historique médical
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section principale -->
+<section class="profile-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="profile-container">
+          <!-- Informations utilisateur -->
+          <div class="user-info">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <h2 class="user-name">{{ user.username }}</h2>
+            <p class="user-email">{{ user.email }}</p>
+            
+            <div class="user-stats">
+              <div class="stat-item">
+                <div class="stat-number">{{ recherches.count }}</div>
+                <div class="stat-label">Recherches</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">{{ user.date_joined|date:"d/m/Y" }}</div>
+                <div class="stat-label">Membre depuis</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">{{ user.last_login|date:"d/m/Y" }}</div>
+                <div class="stat-label">Dernière connexion</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Historique des recherches -->
+          <div class="history-section">
+            <h3 class="history-title">
+              <i class="fas fa-history"></i>
+              Historique des recherches
+            </h3>
+            
+            {% if recherches %}
+              {% for recherche in recherches %}
+                <div class="search-card">
+                  <div class="search-header">
+                    <div class="search-date">
+                      <i class="fas fa-calendar"></i>
+                      {{ recherche.date|date:"d/m/Y à H:i" }}
+                    </div>
+                  </div>
+                  
+                  <div class="search-symptoms">
+                    <strong><i class="fas fa-stethoscope"></i> Symptômes :</strong><br>
+                    {{ recherche.symptomes_bam }}
+                  </div>
+                  
+                  {% if recherche.reponse_bam %}
+                    <div class="search-response">
+                      <div class="search-response-title">
+                        <i class="fas fa-heart"></i>
+                        Conseils médicaux
+                      </div>
+                      <div class="search-response-text">
+                        {{ recherche.reponse_bam }}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-history">
+                <i class="fas fa-search"></i>
+                <h4>Aucune recherche pour l'instant</h4>
+                <p>Commencez par décrire vos symptômes pour voir votre historique ici.</p>
+              </div>
+            {% endif %}
+          </div>
+          
+          <!-- Actions rapides -->
+          <div class="actions-section">
+            <a href="{% url 'pipeline' %}" class="action-card">
+              <div class="action-icon">
+                <i class="fas fa-microphone-alt"></i>
+              </div>
+              <h4 class="action-title">Nouvelle consultation</h4>
+              <p class="action-description">Décrivez vos symptômes et recevez des conseils médicaux</p>
+            </a>
+            
+            <a href="{% url 'centres' %}" class="action-card">
+              <div class="action-icon">
+                <i class="fas fa-hospital"></i>
+              </div>
+              <h4 class="action-title">Centres de santé</h4>
+              <p class="action-description">Trouvez les centres médicaux les plus proches</p>
+            </a>
+            
+            <a href="{% url 'reminders' %}" class="action-card">
+              <div class="action-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <h4 class="action-title">Rappels médicaux</h4>
+              <p class="action-description">Gérez vos rappels de médicaments</p>
+            </a>
+            
+            <a href="{% url 'articles' %}" class="action-card">
+              <div class="action-icon">
+                <i class="fas fa-book-medical"></i>
+              </div>
+              <h4 class="action-title">Conseils santé</h4>
+              <p class="action-description">Consultez nos articles médicaux</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} 

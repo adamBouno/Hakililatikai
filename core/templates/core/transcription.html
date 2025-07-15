@@ -1,0 +1,94 @@
+<!-- core/templates/core/transcription.html -->
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+  <h2 class="mb-4" style="margin-bottom: 0;">Décrivez vos symptômes</h2>
+  <button id="audio-expl-sympt" class="btn btn-info" title="Écouter l'explication en bambara">
+    <i class="fa fa-volume-up"></i> Explication audio
+  </button>
+</div>
+<!-- 1️⃣  zone texte manuelle -->
+<textarea id="sympt-in" rows="4" class="form-control mb-3"
+          placeholder="Parler ou taper vos symptômes en bambara…"></textarea>
+
+<!-- 2️⃣  bouton micro -->
+<button id="mic-btn" class="btn btn-info mb-3">
+    <ion-icon name="mic"></ion-icon> Parler
+</button>
+
+<button id="send-btn" class="btn btn-primary">Envoyer</button>
+
+<hr>
+
+<h4>Réponse :</h4>
+<p id="answer"></p>
+<audio id="tts" controls class="mt-3 d-none"></audio>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'core/js/recorder.js' %}"></script> <!-- tiny lib Recorder.js -->
+<script>
+const csrftoken  = '{{ csrf_token }}';
+let recorder, audioBlob;
+
+document.getElementById('mic-btn').onclick = async () => {
+  if (!recorder) {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recorder = new MediaRecorder(stream);
+    const data = [];
+    recorder.ondataavailable = e => data.push(e.data);
+    recorder.onstop = () => { audioBlob = new Blob(data, {type:'audio/mp4'}) };
+  }
+  recorder.start();
+  setTimeout(()=>recorder.stop(), 5000);   // 5 s d’enregistrement
+};
+
+document.getElementById('send-btn').onclick = () => {
+  const textIn = document.getElementById('sympt-in').value.trim();
+  const fd = new FormData();
+  if (audioBlob) fd.append('audio', audioBlob, 'voice.m4a');
+  if (textIn)    fd.append('text',  textIn);
+
+  fetch("{% url 'api_recherche' %}", {
+    method:'POST',
+    headers: {"X-CSRFToken": csrftoken},
+    body: fd
+  })
+  .then(r => r.json())
+  .then(d => {
+      document.getElementById('answer').textContent = d.reponse;
+      if (d.reponse_mp3_url){
+         const player = document.getElementById('tts');
+         player.src   = d.reponse_mp3_url;
+         player.classList.remove('d-none');
+      }
+  });
+};
+
+// Bouton audio explicatif (API Djelia via /tts/)
+document.getElementById('audio-expl-sympt').onclick = function() {
+  const text = "Bienvenue sur la page de description des symptômes. Ici, vous pouvez décrire vos symptômes en bambara, soit en les écrivant, soit en les enregistrant avec le micro. Vous recevrez une réponse médicale adaptée.";
+  fetch('/tts/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({ text: text })
+  })
+  .then(response => response.blob())
+  .then(blob => {
+    let audio = document.getElementById('audio-djelia-sympt');
+    if (!audio) {
+      audio = document.createElement('audio');
+      audio.id = 'audio-djelia-sympt';
+      document.body.appendChild(audio);
+    }
+    audio.src = URL.createObjectURL(blob);
+    audio.play();
+  });
+};
+</script>
+{% endblock %}

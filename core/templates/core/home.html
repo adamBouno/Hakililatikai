@@ -1,0 +1,1000 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Accueil — Rassurez-moi - Assistance médicale intelligente{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Section moderne */
+  .hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hero-bg-image {
+    background-image: url('/static/core/images/hero_image.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
+    z-index: 1;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+  }
+  
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  
+  .hero-subtitle-container {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 0;
+    opacity: 0.95;
+    line-height: 1.6;
+    color: #ffffff;
+  }
+  
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .hero-btn {
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .hero-btn.primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 8px 25px rgba(16,185,129,0.3);
+  }
+  
+  .hero-btn.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(16,185,129,0.4);
+    color: white;
+  }
+  
+  .hero-btn.secondary {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  .hero-btn.secondary:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-3px);
+    color: white;
+  }
+  
+  /* Lecteur Audio */
+  .audio-player-container {
+    margin-top: 2rem;
+  }
+  
+  .audio-player {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .audio-player:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+  
+  .audio-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .audio-icon {
+    font-size: 1.5rem;
+    color: #10b981;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  
+  .audio-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  .audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .audio-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .audio-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+  }
+  
+  .audio-btn.play-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #10b981;
+  }
+  
+  .audio-btn.play-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  }
+  
+  .audio-btn.stop-btn {
+    background: rgba(239, 68, 68, 0.8);
+    border-color: #ef4444;
+  }
+  
+  .audio-btn.stop-btn:hover {
+    background: rgba(239, 68, 68, 1);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+  }
+  
+  .audio-time {
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+  
+  .audio-progress {
+    margin-top: 1rem;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.1s ease;
+  }
+  
+  .hero-image {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hero-image img {
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  /* Section Services */
+  .services-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    position: relative;
+  }
+  
+  .services-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical-dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23667eea" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23medical-dots)"/></svg>');
+    opacity: 0.5;
+  }
+  
+  .services-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+  }
+  
+  .service-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    backdrop-filter: blur(10px);
+    flex: 0 1 350px;
+    min-width: 300px;
+    max-width: 400px;
+  }
+  
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .service-card:hover {
+    transform: translateY(-20px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    border-color: rgba(102, 126, 234, 0.4);
+  }
+  
+  .service-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 2rem;
+    color: white;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+    position: relative;
+  }
+  
+  .service-icon::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.3;
+    transition: all 0.5s ease;
+  }
+  
+  .service-card:hover .service-icon {
+    transform: scale(1.2) rotate(10deg);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+  }
+  
+  .service-card:hover .service-icon::after {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+  
+  .service-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .service-description {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .service-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.4s ease;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    font-size: 1.05rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .service-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    transition: all 0.4s ease;
+  }
+  
+  .service-link:hover {
+    color: #764ba2;
+    transform: translateX(10px);
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+  }
+  
+  .service-link:hover::before {
+    left: 0;
+  }
+  
+  .service-link span {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Section Statistiques */
+  .stats-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+  }
+  
+  .stat-item {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+  
+  /* Section Articles */
+  .articles-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    position: relative;
+  }
+  
+  .articles-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="article-pattern" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="1" fill="%23667eea" opacity="0.08"/></pattern></defs><rect width="100" height="100" fill="url(%23article-pattern)"/></svg>');
+    opacity: 0.6;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 5rem;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .section-subtitle {
+    font-size: 1.3rem;
+    color: #64748b;
+    max-width: 700px;
+    margin: 0 auto;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+  
+  .articles-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+  }
+  
+  .article-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 2;
+    flex: 0 1 350px;
+    min-width: 300px;
+    max-width: 400px;
+  }
+  
+  .article-card:hover {
+    transform: translateY(-20px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    border-color: rgba(102, 126, 234, 0.4);
+  }
+  
+  .article-image {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+  }
+  
+  .article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .article-card:hover .article-image img {
+    transform: scale(1.2);
+  }
+  
+  .article-category {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  .article-content {
+    padding: 2.5rem;
+  }
+  
+  .article-meta {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .article-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 1.2rem;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .article-excerpt {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .article-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.4s ease;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    font-size: 1.05rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .article-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    transition: all 0.4s ease;
+  }
+  
+  .article-link:hover {
+    color: #764ba2;
+    transform: translateX(10px);
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+  }
+  
+  .article-link:hover::before {
+    left: 0;
+  }
+  
+  .article-link span {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Section CTA */
+  .cta-section {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: white;
+    padding: 5rem 0;
+    text-align: center;
+  }
+  
+  .cta-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+  
+  .cta-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .hero-buttons {
+      flex-direction: column;
+    }
+    
+    .hero-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .service-card {
+      padding: 2rem 1.5rem;
+    }
+    
+    .article-content {
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section hero-bg-image">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            Votre santé, <br>
+            <span class="text-warning">notre priorité</span>
+          </h1>
+          <div class="hero-subtitle-container">
+            <p class="hero-subtitle">
+              Plateforme médicale intelligente et multilingue pour tous au Mali. 
+              Décrivez vos symptômes et recevez des conseils personnalisés en temps réel.
+            </p>
+            
+            <!-- Lecteur Audio Vocal -->
+            <div class="audio-player-container mt-4">
+              <div class="audio-player">
+                <div class="audio-info">
+                  <i class="fas fa-volume-up audio-icon"></i>
+                  <span class="audio-title">Écoutez notre présentation</span>
+                </div>
+                <div class="audio-controls">
+                  <button class="audio-btn play-btn" onclick="toggleAudio()">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <button class="audio-btn stop-btn" onclick="stopAudio()">
+                    <i class="fas fa-stop"></i>
+                  </button>
+                  <div class="audio-time">
+                    <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+                  </div>
+                </div>
+                <div class="audio-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                  </div>
+                </div>
+                <audio id="audioPlayer" preload="metadata">
+                  <source src="{% static 'core/audio/reminder_explain.mp3' %}" type="audio/mpeg">
+                  Votre navigateur ne supporte pas l'élément audio.
+                </audio>
+              </div>
+            </div>
+          </div>
+          <div class="hero-buttons">
+            {% if user.is_authenticated %}
+              <a href="{% url 'pipeline' %}" class="hero-btn primary">
+                <i class="fas fa-stethoscope"></i>
+                Décrire mes symptômes
+              </a>
+              <a href="{% url 'centres' %}" class="hero-btn secondary">
+                <i class="fas fa-hospital"></i>
+                Trouver un centre
+              </a>
+            {% else %}
+              <a href="{% url 'signup' %}" class="hero-btn primary">
+                <i class="fas fa-user-plus"></i>
+                Commencer maintenant
+              </a>
+              <a href="{% url 'login' %}" class="hero-btn secondary">
+                <i class="fas fa-sign-in-alt"></i>
+                Se connecter
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section Services -->
+<section class="services-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Nos Services</h2>
+      <p class="section-subtitle">
+        Découvrez nos services médicaux innovants conçus pour votre bien-être
+      </p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-microphone-alt"></i>
+        </div>
+        <h3 class="service-title">Diagnostic Vocal</h3>
+        <p class="service-description">
+          Décrivez vos symptômes en bambara et recevez des conseils médicaux personnalisés instantanément.
+        </p>
+        <a href="{% url 'pipeline' %}" class="service-link">
+          <span>Essayer maintenant <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-hospital"></i>
+        </div>
+        <h3 class="service-title">Centres de Santé</h3>
+        <p class="service-description">
+          Trouvez les centres médicaux les plus proches avec géolocalisation précise et informations détaillées.
+        </p>
+        <a href="{% url 'centres' %}" class="service-link">
+          <span>Voir les centres <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-bell"></i>
+        </div>
+        <h3 class="service-title">Rappels Médicaux</h3>
+        <p class="service-description">
+          Ne manquez plus vos prises de médicaments avec nos rappels personnalisés et intelligents.
+        </p>
+        <a href="{% url 'reminders' %}" class="service-link">
+          <span>Configurer <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-book-medical"></i>
+        </div>
+        <h3 class="service-title">Conseils Santé</h3>
+        <p class="service-description">
+          Accédez à des articles médicaux fiables et des conseils de santé personnalisés.
+        </p>
+        <a href="{% url 'articles' %}" class="service-link">
+          <span>Lire les conseils <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section Statistiques -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">5000+</span>
+          <div class="stat-label">Utilisateurs satisfaits</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">24/7</span>
+          <div class="stat-label">Disponibilité</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">95%</span>
+          <div class="stat-label">Satisfaction</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">50+</span>
+          <div class="stat-label">Centres partenaires</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section Articles -->
+<section class="articles-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Conseils Santé</h2>
+      <p class="section-subtitle">
+        Restez informé avec nos articles médicaux fiables et nos conseils de santé
+      </p>
+    </div>
+    <div class="articles-grid">
+      {% for art in articles %}
+        <article class="article-card">
+          <div class="article-image">
+            {% if art.img %}
+              <img src="{{ art.img.url }}" alt="{{ art.titre }}">
+            {% else %}
+              <img src="{% static 'core/images/carte1.png' %}" alt="{{ art.titre }}">
+            {% endif %}
+            <div class="article-category">{{ art.categorie|default_if_none:"Santé" }}</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="far fa-calendar-alt"></i>
+              <span>{{ art.date_publication|date:"d M Y" }}</span>
+            </div>
+            <h3 class="article-title">{{ art.titre }}</h3>
+            <p class="article-excerpt">{{ art.accroche }}</p>
+            <a href="{% if art.id %}{% url 'article_detail' art.id %}{% else %}{% url 'articles' %}{% endif %}" class="article-link">
+              <span>Lire la suite <i class="fas fa-arrow-right"></i></span>
+            </a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    {% if user.is_authenticated %}
+      <div class="text-center mt-5">
+        <a href="{% url 'articles' %}" class="hero-btn primary">
+          <i class="fas fa-book-medical"></i>
+          Voir tous les articles
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Section CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title">Prêt à prendre soin de votre santé ?</h2>
+    <p class="cta-subtitle">
+      Rejoignez des milliers d'utilisateurs qui font confiance à Rassurez-moi pour leur bien-être quotidien.
+    </p>
+    <div class="hero-buttons justify-content-center">
+      {% if user.is_authenticated %}
+        <a href="{% url 'pipeline' %}" class="hero-btn primary">
+          <i class="fas fa-stethoscope"></i>
+          Commencer une consultation
+        </a>
+      {% else %}
+        <a href="{% url 'signup' %}" class="hero-btn primary">
+          <i class="fas fa-user-plus"></i>
+          Créer mon compte gratuit
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Script pour le lecteur audio -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const audio = document.getElementById('audioPlayer');
+    const playBtn = document.querySelector('.play-btn');
+    const stopBtn = document.querySelector('.stop-btn');
+    const currentTimeSpan = document.getElementById('currentTime');
+    const totalTimeSpan = document.getElementById('totalTime');
+    const progressFill = document.getElementById('progressFill');
+    
+    let isPlaying = false;
+    
+    // Formatage du temps
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    // Mise à jour du temps affiché
+    function updateTime() {
+        if (!isNaN(audio.duration)) {
+            currentTimeSpan.textContent = formatTime(audio.currentTime);
+            totalTimeSpan.textContent = formatTime(audio.duration);
+            
+            // Mise à jour de la barre de progression
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = progress + '%';
+        }
+    }
+    
+    // Fonction pour jouer/pause
+    window.toggleAudio = function() {
+        if (isPlaying) {
+            audio.pause();
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            isPlaying = false;
+        } else {
+            audio.play().then(() => {
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+            }).catch(error => {
+                console.error('Erreur lors de la lecture audio:', error);
+                alert('Erreur lors de la lecture audio. Veuillez réessayer.');
+            });
+        }
+    };
+    
+    // Fonction pour arrêter
+    window.stopAudio = function() {
+        audio.pause();
+        audio.currentTime = 0;
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+        progressFill.style.width = '0%';
+        currentTimeSpan.textContent = '0:00';
+    };
+    
+    // Événements audio
+    audio.addEventListener('loadedmetadata', function() {
+        totalTimeSpan.textContent = formatTime(audio.duration);
+    });
+    
+    audio.addEventListener('timeupdate', updateTime);
+    
+    audio.addEventListener('ended', function() {
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+        progressFill.style.width = '0%';
+        currentTimeSpan.textContent = '0:00';
+    });
+    
+    audio.addEventListener('error', function(e) {
+        console.error('Erreur audio:', e);
+        alert('Erreur lors du chargement de l\'audio. Veuillez réessayer.');
+    });
+    
+    // Mise à jour initiale
+    updateTime();
+});
+</script>
+{% endblock %}

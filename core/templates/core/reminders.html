@@ -1,0 +1,534 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Rappels Médicaux — Rassurez-moi{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Section pour la page rappels */
+  .reminders-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .reminders-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="reminder-pattern" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="2" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23reminder-pattern)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Section principale */
+  .reminders-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 60vh;
+  }
+  
+  .reminders-container {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .reminders-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  /* Audio explicatif */
+  .audio-explicatif {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .audio-explicatif:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+  }
+  
+  .audio-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+  
+  .audio-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+  }
+  
+  .audio-text {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  /* Formulaire */
+  .form-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    margin-bottom: 3rem;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .form-title i {
+    color: #667eea;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+  }
+  
+  .form-label i {
+    color: #667eea;
+    font-size: 1.1rem;
+  }
+  
+  .form-control {
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 15px;
+    padding: 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+  }
+  
+  .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: white;
+  }
+  
+  .form-control::placeholder {
+    color: #94a3b8;
+  }
+  
+  /* Bouton d'ajout */
+  .add-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    border-radius: 50px;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  
+  .add-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+  }
+  
+  /* Section des rappels */
+  .reminders-list-section {
+    margin-top: 3rem;
+  }
+  
+  .reminders-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .reminders-title i {
+    color: #667eea;
+  }
+  
+  .reminder-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .reminder-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .reminder-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+  
+  .reminder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .reminder-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+  
+  .reminder-time {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  .reminder-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .reminder-badge {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+  }
+  
+  .reminder-description {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .empty-state {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    border: 2px dashed rgba(102, 126, 234, 0.2);
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  .empty-state h4 {
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .reminders-container {
+      padding: 2rem;
+    }
+    
+    .reminder-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .reminders-container {
+      padding: 1.5rem;
+    }
+    
+    .form-section {
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="reminders-hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <i class="fas fa-bell"></i>
+        Rappels Médicaux
+      </h1>
+      <p class="hero-subtitle">
+        Ne manquez plus vos prises de médicaments avec nos rappels personnalisés et intelligents
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section principale -->
+<section class="reminders-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="reminders-container">
+          <!-- Audio explicatif -->
+          <div class="audio-explicatif">
+            <button class="audio-btn" id="reminder-audio-btn" title="Écouter l'explication">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <div class="audio-text">
+              <strong>Écoutez notre guide</strong><br>
+              <small>Découvrez comment configurer vos rappels médicaux</small>
+            </div>
+            <audio id="reminder-audio" src="{% static 'core/audio/reminder_explain.mp3' %}"></audio>
+          </div>
+          
+          <!-- Formulaire d'ajout -->
+          <div class="form-section">
+            <h3 class="form-title">
+              <i class="fas fa-plus-circle"></i>
+              Ajouter un nouveau rappel
+            </h3>
+            <form method="post" class="needs-validation" novalidate>
+              {% csrf_token %}
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="{{ form.titre.id_for_label }}" class="form-label">
+                      <i class="fas fa-tag"></i>
+                      Titre du rappel
+                    </label>
+                    {{ form.titre }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="{{ form.heure.id_for_label }}" class="form-label">
+                      <i class="fas fa-clock"></i>
+                      Heure du rappel
+                    </label>
+                    {{ form.heure }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="{{ form.medicament.id_for_label }}" class="form-label">
+                      <i class="fas fa-pills"></i>
+                      Médicament (optionnel)
+                    </label>
+                    {{ form.medicament }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="{{ form.periodique.id_for_label }}" class="form-label">
+                      <i class="fas fa-calendar"></i>
+                      Fréquence
+                    </label>
+                    {{ form.periodique }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="{{ form.description.id_for_label }}" class="form-label">
+                  <i class="fas fa-edit"></i>
+                  Description (optionnel)
+                </label>
+                {{ form.description }}
+              </div>
+              
+              <button type="submit" class="add-btn">
+                <i class="fas fa-plus"></i>
+                Ajouter le rappel
+              </button>
+            </form>
+          </div>
+          
+          <!-- Liste des rappels -->
+          <div class="reminders-list-section">
+            <h3 class="reminders-title">
+              <i class="fas fa-list"></i>
+              Mes rappels
+            </h3>
+            
+            {% if rappels %}
+              {% for rappel in rappels %}
+                <div class="reminder-card">
+                  <div class="reminder-header">
+                    <div>
+                      <div class="reminder-title">{{ rappel.titre }}</div>
+                      {% if rappel.medicament %}
+                        <div class="reminder-badge">
+                          <i class="fas fa-pills"></i>
+                          {{ rappel.medicament }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="reminder-time">
+                      <i class="fas fa-clock"></i>
+                      {{ rappel.heure|time:"H:i" }}
+                    </div>
+                  </div>
+                  
+                  <div class="reminder-details">
+                    <div class="reminder-badge">
+                      <i class="fas fa-calendar"></i>
+                      {{ rappel.get_periodique_display }}
+                    </div>
+                  </div>
+                  
+                  {% if rappel.description %}
+                    <div class="reminder-description">
+                      <i class="fas fa-info-circle"></i>
+                      {{ rappel.description }}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <h4>Aucun rappel configuré</h4>
+                <p>Commencez par ajouter votre premier rappel médical ci-dessus pour ne plus manquer vos prises de médicaments.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.getElementById('reminder-audio-btn').onclick = function() {
+    var audio = document.getElementById('reminder-audio');
+    audio.play();
+  };
+  
+  // Améliorer l'apparence des champs de formulaire
+  document.addEventListener('DOMContentLoaded', function() {
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(control => {
+      control.classList.add('form-control');
+    });
+  });
+</script>
+{% endblock %}

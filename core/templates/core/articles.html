@@ -1,0 +1,556 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Conseils de Santé — Rassurez-moi{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== PAGE CONSEILS MÉDICAUX ===== */
+  
+  /* Section héros */
+  .conseils-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .conseils-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical-pattern" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23medical-pattern)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .conseils-hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+  }
+  
+  .conseils-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .conseils-hero p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+  
+  .conseils-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+  }
+  
+  .conseils-stat {
+    text-align: center;
+  }
+  
+  .conseils-stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    display: block;
+  }
+  
+  .conseils-stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Section filtres */
+  .conseils-filters {
+    background: white;
+    padding: 2rem 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .filter-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .filter-btn:hover,
+  .filter-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+  }
+  
+  /* Section articles */
+  .conseils-articles {
+    padding: 4rem 0;
+    background: #f8fafc;
+  }
+  
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  .article-card-modern {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .article-card-modern:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+  
+  .article-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .article-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .article-card-modern:hover .article-image {
+    transform: scale(1.05);
+  }
+  
+  .article-category-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+  
+  .article-content {
+    padding: 1.5rem;
+  }
+  
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+  
+  .article-meta i {
+    color: #667eea;
+  }
+  
+  .article-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+  
+  .article-excerpt {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+  
+  .article-read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .article-read-more:hover {
+    color: #5a67d8;
+    transform: translateX(5px);
+  }
+  
+  /* Section CTA */
+  .conseils-cta {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 4rem 0;
+    text-align: center;
+    color: white;
+  }
+  
+  .conseils-cta h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+  
+  .conseils-cta p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: #10b981;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    color: #059669;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .conseils-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .conseils-stats {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .articles-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .filter-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .conseils-cta h2 {
+      font-size: 2rem;
+    }
+  }
+  
+  /* Animation d'entrée */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .article-card-modern {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+  
+  .article-card-modern:nth-child(1) { animation-delay: 0.1s; }
+  .article-card-modern:nth-child(2) { animation-delay: 0.2s; }
+  .article-card-modern:nth-child(3) { animation-delay: 0.3s; }
+  .article-card-modern:nth-child(4) { animation-delay: 0.4s; }
+  .article-card-modern:nth-child(5) { animation-delay: 0.5s; }
+  .article-card-modern:nth-child(6) { animation-delay: 0.6s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Section Héros -->
+<section class="conseils-hero">
+  <div class="container">
+    <div class="conseils-hero-content">
+      <h1>Conseils de Santé</h1>
+      <p>Découvrez nos conseils médicaux personnalisés pour maintenir votre santé et celle de votre famille. Des informations fiables et accessibles en bambara et en français.</p>
+      
+      <div class="conseils-stats">
+        <div class="conseils-stat">
+          <span class="conseils-stat-number">{{ articles|length }}+</span>
+          <span class="conseils-stat-label">Articles</span>
+        </div>
+        <div class="conseils-stat">
+          <span class="conseils-stat-number">24/7</span>
+          <span class="conseils-stat-label">Disponible</span>
+        </div>
+        <div class="conseils-stat">
+          <span class="conseils-stat-number">100%</span>
+          <span class="conseils-stat-label">Gratuit</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section Filtres -->
+<section class="conseils-filters">
+  <div class="container">
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-category="all">Tous les conseils</button>
+      <button class="filter-btn" data-category="prevention">Prévention</button>
+      <button class="filter-btn" data-category="urgence">Urgences</button>
+      <button class="filter-btn" data-category="pediatrie">Pédiatrie</button>
+      <button class="filter-btn" data-category="grossesse">Grossesse</button>
+      <button class="filter-btn" data-category="nutrition">Nutrition</button>
+    </div>
+  </div>
+</section>
+
+<!-- Section Articles -->
+<section class="conseils-articles">
+  <div class="container">
+    {% if articles %}
+      <div class="articles-grid">
+        {% for article in articles %}
+          <article class="article-card-modern" data-category="{{ article.categorie|lower }}">
+            <div class="article-image-container">
+              {% if article.image %}
+                <img src="{{ article.image.url }}" class="article-image" alt="{{ article.titre }}">
+              {% else %}
+                <img src="{% static 'core/images/carte'|add:forloop.counter|add:'.png' %}" class="article-image" alt="{{ article.titre }}">
+              {% endif %}
+              <div class="article-category-badge">
+                {{ article.get_categorie_display }}
+              </div>
+            </div>
+            
+            <div class="article-content">
+              <div class="article-meta">
+                <i class="fas fa-calendar-alt"></i>
+                <span>{{ article.date_publication|date:"d M Y" }}</span>
+                <i class="fas fa-clock"></i>
+                <span>5 min de lecture</span>
+              </div>
+              
+              <h3 class="article-title">{{ article.titre }}</h3>
+              <p class="article-excerpt">{{ article.extrait_150 }}</p>
+              
+              <a href="{% url 'article_detail' article.id %}" class="article-read-more">
+                Lire l'article complet
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Articles par défaut si la base est vide -->
+      <div class="articles-grid">
+        <article class="article-card-modern" data-category="prevention">
+          <div class="article-image-container">
+            <img src="{% static 'core/images/carte1.png' %}" class="article-image" alt="Prévenir le paludisme">
+            <div class="article-category-badge">Prévention</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Aujourd'hui</span>
+              <i class="fas fa-clock"></i>
+              <span>5 min de lecture</span>
+            </div>
+            <h3 class="article-title">Prévenir le paludisme</h3>
+            <p class="article-excerpt">Conseils essentiels pour protéger votre famille contre le paludisme. Découvrez les méthodes de prévention efficaces et les signes d'alerte à reconnaître.</p>
+            <a href="#" class="article-read-more">
+              Lire l'article complet
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+        
+        <article class="article-card-modern" data-category="urgence">
+          <div class="article-image-container">
+            <img src="{% static 'core/images/carte2.png' %}" class="article-image" alt="Reconnaître l'anémie">
+            <div class="article-category-badge">Urgences</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Hier</span>
+              <i class="fas fa-clock"></i>
+              <span>4 min de lecture</span>
+            </div>
+            <h3 class="article-title">Reconnaître l'anémie</h3>
+            <p class="article-excerpt">Apprenez à identifier les signes de l'anémie chez l'enfant et l'adulte. Quand consulter rapidement et quels aliments privilégier.</p>
+            <a href="#" class="article-read-more">
+              Lire l'article complet
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+        
+        <article class="article-card-modern" data-category="pediatrie">
+          <div class="article-image-container">
+            <img src="{% static 'core/images/carte3.png' %}" class="article-image" alt="Fièvre chez l'enfant">
+            <div class="article-category-badge">Pédiatrie</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Il y a 2 jours</span>
+              <i class="fas fa-clock"></i>
+              <span>6 min de lecture</span>
+            </div>
+            <h3 class="article-title">Fièvre chez l'enfant</h3>
+            <p class="article-excerpt">Guide complet pour gérer la fièvre de votre enfant. Quand s'inquiéter et quels gestes adopter pour le soulager efficacement.</p>
+            <a href="#" class="article-read-more">
+              Lire l'article complet
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+        
+        <article class="article-card-modern" data-category="prevention">
+          <div class="article-image-container">
+            <img src="{% static 'core/images/carte4.png' %}" class="article-image" alt="Vaccinations essentielles">
+            <div class="article-category-badge">Prévention</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Il y a 3 jours</span>
+              <i class="fas fa-clock"></i>
+              <span>7 min de lecture</span>
+            </div>
+            <h3 class="article-title">Vaccinations essentielles</h3>
+            <p class="article-excerpt">Le calendrier vaccinal simplifié pour protéger votre famille. Quels vaccins sont obligatoires et quand les faire.</p>
+            <a href="#" class="article-read-more">
+              Lire l'article complet
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+        
+        <article class="article-card-modern" data-category="nutrition">
+          <div class="article-image-container">
+            <img src="{% static 'core/images/carte5.png' %}" class="article-image" alt="Diabète et glycémie">
+            <div class="article-category-badge">Nutrition</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Il y a 4 jours</span>
+              <i class="fas fa-clock"></i>
+              <span>8 min de lecture</span>
+            </div>
+            <h3 class="article-title">Diabète : surveiller sa glycémie</h3>
+            <p class="article-excerpt">Conseils pratiques pour gérer le diabète au quotidien. Mesures de glycémie, alimentation adaptée et suivi médical.</p>
+            <a href="#" class="article-read-more">
+              Lire l'article complet
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+        
+        <article class="article-card-modern" data-category="urgence">
+          <div class="article-image-container">
+            <img src="{% static 'core/images/carte6.png' %}" class="article-image" alt="Déshydratation">
+            <div class="article-category-badge">Urgences</div>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Il y a 5 jours</span>
+              <i class="fas fa-clock"></i>
+              <span>5 min de lecture</span>
+            </div>
+            <h3 class="article-title">Déshydratation : réagir vite</h3>
+            <p class="article-excerpt">Comment reconnaître et traiter la déshydratation chez l'enfant et l'adulte. Préparation d'ORS maison en 3 étapes simples.</p>
+            <a href="#" class="article-read-more">
+              Lire l'article complet
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Section CTA -->
+<section class="conseils-cta">
+  <div class="container">
+    <h2>Besoin de conseils personnalisés ?</h2>
+    <p>Décrivez vos symptômes en bambara et recevez des conseils médicaux adaptés à votre situation. Notre assistant intelligent est disponible 24h/24.</p>
+    <a href="{% url 'pipeline' %}" class="cta-btn">
+      <i class="fas fa-stethoscope"></i>
+      Consulter maintenant
+    </a>
+  </div>
+</section>
+
+<script>
+// Filtrage des articles par catégorie
+document.addEventListener('DOMContentLoaded', function() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const articles = document.querySelectorAll('.article-card-modern');
+  
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const category = this.getAttribute('data-category');
+      
+      // Mettre à jour les boutons actifs
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Filtrer les articles
+      articles.forEach(article => {
+        const articleCategory = article.getAttribute('data-category');
+        
+        if (category === 'all' || articleCategory === category) {
+          article.style.display = 'block';
+          article.style.animation = 'fadeInUp 0.6s ease forwards';
+        } else {
+          article.style.display = 'none';
+        }
+      });
+    });
+  });
+});
+</script>
+{% endblock %} 
